@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"></html>
+<html lang="en">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -20,6 +20,22 @@
   <script src="https://cdn.jsdelivr.net/momentjs/2.12.0/moment.min.js"></script>
 
   <title>Post-It Game</title>
+  <style>
+  #order_by_like,#order_by_dislike{
+    font-weight:bold;
+    padding: 0 10px;
+    font-size:20px;    
+  }
+  #order_by_like:hover, #order_by_dislike:hover{
+    color:gray;
+    cursor:pointer;
+    text-decoration: underline;
+  }
+
+  #sorting_div{
+    padding-bottom:20px;
+  }
+</style>
 </head>
 <body> 
   <!--TOPIC DISPLAY CONTAINER    -->
@@ -31,11 +47,20 @@
   </nav><br/>
   <!--POST-IT DISPLAY AREA-->
   <div class="container">
+    <div class="row justify-content-center" id="sorting_div">
+      <span id="order_by_like">Order by likes</span>
+      <span id="order_by_dislike">Order by dislikes</span>
+    </div>
+      
     <div class="row justify-content-center" id="post_area">
+     
 
       <!--BUTTONS FOR SLIDE OUT COMPONENTS -->
       <!--BOTTOM BUTTON -->
-      <p><a id="bottom_nav_show" class="btn btn-lg text-white background_blue left">Post-It</a></p>
+    </div>
+    <div class="row justify-content-center"> 
+      <button id="bottom_nav_show" class="btn btn-lg text-white background_blue left">Post-It</button>
+
       <!--SIDEBAR BUTTON-->
       <p><a id="leaderboard_show" class="btn btn-lg bg-white round_button right"><i aria-hidden="true" class="fa fa-chevron-circle-left fa-3x text_blue"></i></a></p>
     </div>
@@ -87,3 +112,4 @@
   <!--JAVASCRIPT-->
   <script src="assets/js/app.js"></script>
 </body>
+</html>

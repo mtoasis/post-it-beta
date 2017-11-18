@@ -1,13 +1,12 @@
-
-  var config = {
-    apiKey: "AIzaSyB-oSIp-lGKykAVqmMtMKPJ52XPpBHAijQ",
-    authDomain: "post-it-c9bc7.firebaseapp.com",
-    databaseURL: "https://post-it-c9bc7.firebaseio.com",
-    projectId: "post-it-c9bc7",
-    storageBucket: "post-it-c9bc7.appspot.com",
-    messagingSenderId: "314587791240"
-  };
-  firebase.initializeApp(config);
+var config = {
+  apiKey: "AIzaSyB-oSIp-lGKykAVqmMtMKPJ52XPpBHAijQ",
+  authDomain: "post-it-c9bc7.firebaseapp.com",
+  databaseURL: "https://post-it-c9bc7.firebaseio.com",
+  projectId: "post-it-c9bc7",
+  storageBucket: "post-it-c9bc7.appspot.com",
+  messagingSenderId: "314587791240"
+};
+firebase.initializeApp(config);
 
 var database = firebase.database();
 var ref = database.ref();
@@ -135,7 +134,6 @@ ref.child("Posts").once("value",function(snap){
 	index = snap.numChildren();
 	// console.log("index: "+index)
 
-
 	snap.forEach(function(childsnap){
 
 	i +=1;
@@ -167,6 +165,7 @@ ref.child("Posts").once("value",function(snap){
 	i=Number(i);
 
 	$("#post_area").append(post)
+	// like_refresh();
 
 })
 
@@ -175,6 +174,7 @@ ref.child("Posts").on("value",function(snap){
 	new_index = snap.numChildren();
 
 })
+like_refresh();
 
 ref.child("Posts").limitToLast(1).on("child_added", function(snap){
 	
@@ -220,16 +220,14 @@ ref.child("Posts").limitToLast(1).on("child_added", function(snap){
 
 $("#submit_button").on("click",function(){
 
+	$("#bottom_nav_show").attr("disabled","disabled")
+
 	var input_text = $("#input_text").val().trim();
 
-	var posting = {
-		text: input_text,
-		like: 0,
-		dislike: 0
-	}
 	var index;
 	ref.child("Posts").once("value", function(snap){
 	var index = 1+snap.numChildren();
+
 
 	if (index<10){
 	index = String("00"+index);
@@ -242,13 +240,22 @@ if (index>=10 && index<100){
 	console.log("index is :"+index)
 	console.log(typeof index)
 }
+	var posting = {
+		text: input_text,
+		like: 0,
+		dislike: 0,
+		index: index
+	}
+
 	ref.child("Posts").child("post"+index).update(posting);
 	$("#input_text").val("");
 })
 })
 
-ref.on("value",function(){
+function like_refresh(){
+	ref.on("value",function(){
 	ref.child("Posts").on("value",function(snap){
+
 
 		var index = snap.numChildren();
 		var array_like = [];
@@ -259,7 +266,6 @@ ref.on("value",function(){
 			var dislikes = childsnap.val().dislike;	
 			array_like.push(likes);
 			array_dislike.push(dislikes);
-
 		})
 			for (var i=0;i<index;i++){
 
@@ -276,17 +282,19 @@ ref.on("value",function(){
 			$(target2).text("Dislike: "+array_dislike[i])
 		}
 
-		console.log(array_like.length)
+		// console.log(array_like.length)
 
 	})
 });
+}
 
-
+setInterval(like_refresh,3000)
 
 
 
 $(document).on("click",".thumb_up", function(){
 	var id = $(this).parent().attr("id");
+	$(this).attr("disabled","disabled")
 	// console.log(id);
 	var like;	
 	ref.child("Posts").child("post"+id).on("value", function(snap){
@@ -299,6 +307,7 @@ $(document).on("click",".thumb_up", function(){
 })
 
 $(document).on("click",".thumb_down", function(){
+	$(this).attr("disabled","disabled")
 	var id = $(this).parent().attr("id");
 	var dislike;	
 	ref.child("Posts").child("post"+id).on("value", function(snap){
@@ -309,6 +318,75 @@ $(document).on("click",".thumb_down", function(){
 
 	ref.child("Posts").child("post"+id).update(updating);
 })
+
+
+$("#order_by_like").on("click",function(){
+	$("#post_area").empty();
+
+	ref.child("Posts").orderByChild("like").on("child_added",function(snap){
+		console.log(snap.val())
+		var index = snap.numChildren();
+
+	var post_text = snap.val().text;
+
+	var choice_color = Math.floor(Math.random()*4);
+	var choice_rotate = Math.floor(Math.random()*3);
+	var i = snap.val().index;
+	var post = $('<div id="'+i+'" class="postit '+color_array[choice_color]+' '+rotation_array[choice_rotate]+'">');
+	post.append($('<p>'+post_text+'</p>'));
+	var button = $('<button class="thumb_up">Like</button>');
+	post.append(button)
+	var button2 = $('<button class="thumb_down">Dislike</button>');
+	post.append(button2)
+	post.append('<br>')
+	var like_text = $('<span id="like'+i+'"">++</span>')
+	post.append(like_text)
+	post.append('<br>')
+	var dislike_text = $('<span id="dislike'+i+'"">--</span>')
+	post.append(dislike_text)
+
+	$("#post_area").prepend(post)
+	like_refresh();
+
+})
+
+	})
+
+$("#order_by_dislike").on("click",function(){
+	$("#post_area").empty();
+
+	ref.child("Posts").orderByChild("dislike").on("child_added",function(snap){
+		console.log(snap.val())
+		var index = snap.numChildren();
+
+	var post_text = snap.val().text;
+
+	var choice_color = Math.floor(Math.random()*4);
+	var choice_rotate = Math.floor(Math.random()*3);
+	var i = snap.val().index;
+
+	var post = $('<div id="'+i+'" class="postit '+color_array[choice_color]+' '+rotation_array[choice_rotate]+'">');
+	post.append($('<p>'+post_text+'</p>'));
+	var button = $('<button class="thumb_up">Like</button>');
+	post.append(button)
+	var button2 = $('<button class="thumb_down">Dislike</button>');
+	post.append(button2)
+	post.append('<br>')
+	var like_text = $('<span id="like'+i+'"">++</span>')
+	post.append(like_text)
+	post.append('<br>')
+	var dislike_text = $('<span id="dislike'+i+'"">--</span>')
+	post.append(dislike_text)
+
+	$("#post_area").prepend(post)
+
+	like_refresh();
+
+})
+
+	})
+
+
 
 
 
