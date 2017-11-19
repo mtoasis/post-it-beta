@@ -128,11 +128,22 @@ var color_array = ["gradient_purple","gradient_yellow","gradient_green","gradien
 var rotation_array = ["rotate-left","rotate-right",""];
 
 
+$(document).on("keyup", "#input_text", function(){
+	var text_count = $("#input_text").val().length;
+	console.log(text_count)
+	if (text_count>=80){
+		$("#warning").text("You can't type more than 80 characters")
+		$()
+	}
+	else{
+		$("#warning").text("Character count: "+text_count)
+	}
+})
+
 
 ref.child("Posts").once("value",function(snap){
 
 	index = snap.numChildren();
-	// console.log("index: "+index)
 
 	snap.forEach(function(childsnap){
 
@@ -221,6 +232,7 @@ ref.child("Posts").limitToLast(1).on("child_added", function(snap){
 $("#submit_button").on("click",function(){
 
 	$("#bottom_nav_show").attr("disabled","disabled")
+	$("#submit_button").attr("disabled","disabled")
 
 	var input_text = $("#input_text").val().trim();
 
